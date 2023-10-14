@@ -1,0 +1,987 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: May 13, 2023 at 10:20 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `doanweb`
+--
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAbortOrder` (IN `shopId` INT)   SELECT DISTINCT	billdetail.Id as ID,
+				billdetail.ProductName as ProductName,
+				member.Name as CusName,
+        		bill.Address as Address,
+        		bill.create_at as Time,
+        		billdetail.Price as Price,
+        		billdetail.Quantity as Quantity
+FROM billdetail
+JOIN bill 
+ON billdetail.IdBill = bill.Id
+JOIN member 
+ON bill.IdMember = member.Id
+JOIN product
+ON billdetail.IdProduct = product.Id
+WHERE billdetail.Status = 5 AND product.user_id = shopId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAccountAddress` (IN `MemberId` INT)   SELECT address.Id as AddressId, member.Name, member.Phone, address.Name as AddressName, address.Status 
+FROM member 
+join address
+on member.Id = address.MemberId
+where member.Id = MemberId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAccountBalance` (IN `userid` INT)   SELECT AccountBalance
+FROM member
+where member.Id = userid$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAccountDetail` (IN `memberIdParam` INT)   SELECT *, 
+            (
+            SELECT Name
+            FROM Address
+            WHERE MemberId = memberIdParam and status = 1
+            ) AS Address
+            FROM member              
+            where member.id = memberIdParam$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getCarrierInfo` ()   BEGIN
+    SELECT carrier.id, carrier.name, carrier.address, carrier.phone, carrier.email
+    FROM carrier
+    WHERE carrier.carrierstatus = 1;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCartDetail` (IN `memberId` INT)   SELECT cartdetail.Id as CartDetailId, 
+	   product.Id as ProductId ,
+       product.Name as Name, 
+       cartdetail.Quantity as Quantity, 
+       cartdetail.Price as Price,
+       (
+           SELECT ImgProductPath
+           FROM imageproduct
+           WHERE ProductId = product.Id
+           LIMIT 1
+       ) AS Pic
+FROM cart
+join cartdetail
+on cart.Id = cartdetail.CartId
+join product
+on cartdetail.ProductId = product.Id
+WHERE cart.Status = 0 and cart.member_id = memberId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getConfirmOrder` (IN `shopId` INT)   SELECT DISTINCT	billdetail.Id as ID,
+				billdetail.ProductName as ProductName,
+				member.Name as CusName,
+        		bill.Address as Address,
+        		bill.create_at as Time,
+        		billdetail.Price as Price,
+        		billdetail.Quantity as Quantity
+FROM billdetail
+JOIN bill 
+ON billdetail.IdBill = bill.Id
+JOIN member 
+ON bill.IdMember = member.Id
+JOIN product
+ON billdetail.IdProduct = product.Id
+WHERE billdetail.Status = 2 AND product.user_id = shopId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getDeliveryOrderSuccess` (IN `shopId` INT)   SELECT DISTINCT	billdetail.Id as ID,
+				billdetail.ProductName as ProductName,
+				member.Name as CusName,
+        		bill.Address as Address,
+        		bill.create_at as Time,
+        		billdetail.Price as Price,
+        		billdetail.Quantity as Quantity
+FROM billdetail
+JOIN bill 
+ON billdetail.IdBill = bill.Id
+JOIN member 
+ON bill.IdMember = member.Id
+JOIN product
+ON billdetail.IdProduct = product.Id
+WHERE billdetail.Status = 4 AND product.user_id = shopId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getDetailOrder` (IN `orderID` INT)   SELECT	orderdetail.Id as ID,
+		member.Name as CusName,
+        orders.Address as Address,
+        orderdetail.ProductName as ProductName,
+        orderdetail.Price as Price,
+        orderdetail.Quantity as Quantity
+FROM orderdetail
+JOIN orders 
+ON orderdetail.IdOrder = orders.Id
+JOIN member
+on orders.IdMember = member.Id
+WHERE orderdetail.IdOrder = orderID$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getImageProductByProductId` (IN `user_id` INT)   BEGIN
+   SELECT imageproduct.id AS ID, imageproduct.ImgProductPath AS Pic, imageproduct.ProductId AS ProductID, product.Name AS ProductName 
+   FROM imageproduct
+   JOIN product ON imageproduct.ProductId=product.Id
+   WHERE product.user_id = user_id
+   ORDER BY imageproduct.ProductId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getMemberInfo` ()   BEGIN
+    SELECT member.Id, member.Name, member.Phone, member.Username, member.AccountBalance,member.RoleId as Role
+    FROM member
+    WHERE member.userstatus = 1;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getNewOrder` (IN `shopId` INT)   SELECT DISTINCT	billdetail.Id as ID,
+				billdetail.ProductName as ProductName,
+				member.Name as CusName,
+        		bill.Address as Address,
+        		bill.create_at as Time,
+        		billdetail.Price as Price,
+        		billdetail.Quantity as Quantity
+FROM billdetail
+JOIN bill 
+ON billdetail.IdBill = bill.Id
+JOIN member 
+ON bill.IdMember = member.Id
+JOIN product
+ON billdetail.IdProduct = product.Id
+WHERE billdetail.Status = 1 AND product.user_id = shopId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getPreDeliveryOrder` (IN `shopId` INT)   SELECT DISTINCT	billdetail.Id as ID,
+				billdetail.ProductName as ProductName,
+				member.Name as CusName,
+        		bill.Address as Address,
+        		bill.create_at as Time,
+        		billdetail.Price as Price,
+        		billdetail.Quantity as Quantity
+FROM billdetail
+JOIN bill 
+ON billdetail.IdBill = bill.Id
+JOIN member 
+ON bill.IdMember = member.Id
+JOIN product
+ON billdetail.IdProduct = product.Id
+WHERE billdetail.Status = 3 AND product.user_id = shopId$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getProduct` ()   BEGIN
+    SELECT product.Id, product.Name, product.Price, product.QuantityInStock, product.Description,categoryproduct.Name as CategoryName, member.Name as ShopName
+    FROM product
+    JOIN categoryproduct 
+    ON product.CategoryId = categoryproduct.Id
+JOIN member
+    ON product.user_id= member.Id
+    WHERE product.deleted = 0;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getProductByUserId` (IN `user_id` INT)   BEGIN
+    SELECT product.Id, product.Name, product.Price, product.QuantityInStock, product.Description,categoryproduct.Name as CategoryName
+    FROM product
+    JOIN categoryproduct 
+    ON product.CategoryId = categoryproduct.Id
+    WHERE product.user_id = user_id AND product.deleted = 0;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetQuantityCartDetail` (IN `MemberId` INT)   SELECT Count(cartdetail.ProductId) as Count  FROM cart
+join cartdetail
+on cart.Id = cartdetail.CartId
+join product
+on cartdetail.ProductId = product.Id
+WHERE cart.Status = 0 and cart.member_id = MemberId$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `address`
+--
+
+CREATE TABLE `address` (
+  `ID` int(11) NOT NULL,
+  `MemberId` int(11) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `Status` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `address`
+--
+
+INSERT INTO `address` (`ID`, `MemberId`, `Name`, `Status`) VALUES
+(1, 2, 'Đức Giang, Long Biên, Hà Nội', 1),
+(2, 1, 'Đức Giang, Long Biên, Hà Nội', 1),
+(3, 3, 'Đức Giang, Long Biên, Hà Nội', 1),
+(4, 4, 'Đức Giang, Long Biên, Hà Nội', 1),
+(5, 7, 'Ngọc Lâm', 1),
+(6, 1, 'Ngọc Lâm, Long Biên, Hà Nội', 0),
+(7, 1, 'Hoàng Mai', 0),
+(8, 10, 'LB', 1),
+(9, 11, 'Viet Nam', 1),
+(10, 12, 'Viet Nam', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bill`
+--
+
+CREATE TABLE `bill` (
+  `Id` int(11) NOT NULL,
+  `IdMember` int(11) DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `TotalPrice` int(11) DEFAULT NULL,
+  `Address` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `billdetail`
+--
+
+CREATE TABLE `billdetail` (
+  `Id` int(11) NOT NULL,
+  `IdBill` int(11) DEFAULT NULL,
+  `ProductName` varchar(50) DEFAULT NULL,
+  `Price` int(11) DEFAULT NULL,
+  `Quantity` int(11) DEFAULT NULL,
+  `IdProduct` int(11) NOT NULL,
+  `Status` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `carrier`
+--
+
+CREATE TABLE `carrier` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `carrierstatus` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `carrier`
+--
+
+INSERT INTO `carrier` (`id`, `name`, `address`, `phone`, `email`, `carrierstatus`) VALUES
+(1, 'DHL', '123 Main St, New York, NY', '555-1234', 'info@dhl.com', 1),
+(2, 'FedEx', '456 Elm St, Los Angeles, CA', '555-5678', 'info@fedex.com', 1),
+(3, 'UPS', '789 Oak St, Chicago, IL', '555-9012', 'info@ups.com', 0),
+(4, 'USPS', '101 Pine St, San Francisco, CA', '555-3456', 'info@usps.com', 1),
+(5, 'Amazon Logistics', '1000 Maple St, Seattle, WA', '555-7890', 'info@amazon.com', 1),
+(6, 'Shopee', 'Ha Noi, Viet Nam', '012345678910', 'info@shopee.com', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
+CREATE TABLE `cart` (
+  `Id` int(11) NOT NULL,
+  `member_id` int(11) NOT NULL,
+  `create_at` datetime DEFAULT NULL,
+  `Status` int(11) DEFAULT NULL,
+  `AddressId` int(11) DEFAULT NULL,
+  `PaymentMethodId` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cartdetail`
+--
+
+CREATE TABLE `cartdetail` (
+  `Id` int(11) NOT NULL,
+  `CartId` int(11) NOT NULL,
+  `ProductId` int(11) NOT NULL,
+  `Quantity` int(11) NOT NULL,
+  `Price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categoryproduct`
+--
+
+CREATE TABLE `categoryproduct` (
+  `Id` int(11) NOT NULL,
+  `Name` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `categoryproduct`
+--
+
+INSERT INTO `categoryproduct` (`Id`, `Name`) VALUES
+(1, 'Đồ điện tử'),
+(2, 'Quần áo'),
+(3, 'Điện thoại');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comment`
+--
+
+CREATE TABLE `comment` (
+  `Id` int(11) NOT NULL,
+  `MemberId` int(11) NOT NULL,
+  `ProductId` int(11) NOT NULL,
+  `Create_at` datetime NOT NULL,
+  `Content` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment`
+--
+
+INSERT INTO `comment` (`Id`, `MemberId`, `ProductId`, `Create_at`, `Content`) VALUES
+(1, 7, 26, '2023-05-06 00:00:00', 'Hàng đẹp'),
+(2, 7, 26, '2023-05-07 00:00:00', 'Đẹp tuyệt vời !!!'),
+(3, 7, 25, '2023-05-07 00:00:00', 'Đồng hồ đẹp quá'),
+(4, 7, 25, '2023-05-07 00:00:00', 'Tuyệt vời !!!'),
+(5, 8, 26, '2023-05-07 00:00:00', 'Áo phao mặc hơi nóng nhưng mặc vào cảm giác vjp pro'),
+(6, 9, 26, '2023-05-07 00:00:00', 'Áo cũng đẹp đấy');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `deposit`
+--
+
+CREATE TABLE `deposit` (
+  `Id` int(11) NOT NULL,
+  `Member_Id` int(11) DEFAULT NULL,
+  `AmountMoney` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `deposit`
+--
+
+INSERT INTO `deposit` (`Id`, `Member_Id`, `AmountMoney`) VALUES
+(16, 1, 700000),
+(17, 1, 300000),
+(18, 7, 700000);
+
+--
+-- Triggers `deposit`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_UpdateAccountBalance` AFTER INSERT ON `deposit` FOR EACH ROW BEGIN
+-- statements
+    DECLARE Member_Id INT;
+    DECLARE AmountMoney INT; 
+    DECLARE AccountBalanceUpdate INT;
+    SET Member_Id = NEW.Member_Id;
+    SET AmountMoney = NEW.AmountMoney;
+    SET AccountBalanceUpdate = (SELECT AccountBalance FROM member WHERE Id = Member_Id);
+    SET AccountBalanceUpdate = AccountBalanceUpdate + AmountMoney;
+    UPDATE member SET AccountBalance = AccountBalanceUpdate WHERE Id = Member_Id;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `imageproduct`
+--
+
+CREATE TABLE `imageproduct` (
+  `Id` int(11) NOT NULL,
+  `ImgProductPath` varchar(500) NOT NULL,
+  `ProductId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `imageproduct`
+--
+
+INSERT INTO `imageproduct` (`Id`, `ImgProductPath`, `ProductId`) VALUES
+(20, 'imageProduct-1682240192-2.webp', 20),
+(21, 'imageProduct-1682240428-2.webp', 21),
+(22, 'imageProduct-1682240553-2.webp', 22),
+(23, 'imageProduct-1682240583-2.webp', 23),
+(24, 'imageProduct-1682240607-2.webp', 24),
+(25, 'imageProduct-1682240646-2.webp', 25),
+(26, 'imageProduct-1682240666-2.webp', 26),
+(31, 'ImageProduct-1682351056-2.png', 20),
+(35, 'imageProduct-1683558894-10.jpg', 33);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `member`
+--
+
+CREATE TABLE `member` (
+  `Id` int(11) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `Gender` varchar(255) DEFAULT NULL,
+  `Birthday` date NOT NULL,
+  `Phone` varchar(255) NOT NULL,
+  `Username` varchar(255) NOT NULL,
+  `Password` varchar(255) NOT NULL,
+  `ava_img_path` varchar(255) DEFAULT NULL,
+  `RoleID` int(11) DEFAULT NULL,
+  `AccountBalance` int(11) DEFAULT 0,
+  `CreateAt` datetime DEFAULT NULL,
+  `userstatus` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `member`
+--
+
+INSERT INTO `member` (`Id`, `Name`, `Gender`, `Birthday`, `Phone`, `Username`, `Password`, `ava_img_path`, `RoleID`, `AccountBalance`, `CreateAt`, `userstatus`) VALUES
+(1, 'nam1', 'Male', '2001-03-14', '094789432', 'nam', 'nam', NULL, 2, 4200000, '2022-05-19 11:55:16', 1),
+(2, 'nam', 'Male', '2023-04-05', '13213131', 'namshop', 'nam', 'duyanhvjppro.jpg', 3, 0, '2020-07-16 11:55:31', 1),
+(3, 'nam', 'Male', '2023-04-05', '13213131', 'admin', '123', NULL, 1, 0, '2016-05-19 11:55:56', 1),
+(4, 'nam', 'Male', '2023-04-01', '13131312321', 'nam2', 'nam', NULL, 2, 0, '2020-05-29 11:56:06', 0),
+(7, 'Ngọc Linh', 'Female', '2023-05-06', '909001238012', 'ngoclinh123', '123', 'imageAva-7-ngoclinh123.jpg', 2, 700000, '2023-03-15 11:56:17', 1),
+(8, 'Trung Kiên', 'Male', '2023-05-09', '097891120', 'trungkien', '123', 'imageAva-33-Hiimjolly.jpg', 2, 0, '2023-03-28 11:56:33', 1),
+(9, 'Đăng Tùng ', 'Male', '2016-05-11', '0946339872', 'dangtung', '123', 'dangtungvjppro.jpg', 2, 0, '2016-05-19 13:12:00', 1),
+(10, 'namshop2', 'Male', '2023-05-05', '13131312321', 'namshop2', 'nam', NULL, 3, 0, NULL, 1),
+(11, 'namgay', 'Female', '2023-05-02', '0123456789', 'imheretobedeleted', '123', NULL, 2, 0, NULL, 0),
+(12, 'namgay1', 'Female', '2023-05-01', '01234567899', 'namgay', '123', NULL, 2, 0, '2023-05-11 00:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `message`
+--
+
+CREATE TABLE `message` (
+  `Id` int(11) NOT NULL,
+  `FromUserId` int(11) NOT NULL,
+  `ToUserId` int(11) NOT NULL,
+  `Body` mediumtext DEFAULT NULL,
+  `CreateAt` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `message`
+--
+
+INSERT INTO `message` (`Id`, `FromUserId`, `ToUserId`, `Body`, `CreateAt`) VALUES
+(1, 7, 2, 'hello', '2023-05-10 00:00:00'),
+(2, 7, 2, 'yolo', '2023-05-10 00:00:00'),
+(3, 8, 2, 'xin chào', '2023-05-10 00:00:00'),
+(4, 8, 2, 'xin chào 2', '2023-05-10 00:00:00'),
+(5, 2, 7, 'Xin chao', '2023-05-11 08:44:19'),
+(6, 2, 7, '3', '2023-05-11 08:59:13'),
+(7, 2, 7, 'Chào bạn !!!', '2023-05-11 09:38:06'),
+(8, 7, 2, 'Xin chào bạn', '2023-05-11 09:38:22'),
+(9, 2, 7, 'helllo', '2023-05-11 10:06:33'),
+(10, 2, 7, 'tuyệt vời', '2023-05-11 10:06:53'),
+(13, 7, 2, 'cảm ơn bạn', '2023-05-11 10:44:01'),
+(14, 2, 7, 'oke b nhé', '2023-05-11 10:44:10'),
+(15, 2, 7, 'oke nhé', '2023-05-11 10:44:34'),
+(16, 7, 2, 'ok', '2023-05-11 10:45:13'),
+(17, 2, 7, 'xin chào b', '2023-05-11 10:46:07'),
+(18, 7, 2, 'chào bạn', '2023-05-11 10:46:13'),
+(19, 2, 7, 'bạn đẹp tuyệt vời !!!', '2023-05-11 10:51:35'),
+(20, 7, 2, 'oke cảm ơn bạn nhé', '2023-05-11 10:51:43'),
+(21, 2, 7, 'chào bạn', '2023-05-11 12:26:04'),
+(22, 2, 7, 'hello', '2023-05-11 12:28:14'),
+(23, 2, 7, 'yolo', '2023-05-11 12:28:21'),
+(24, 2, 7, '2', '2023-05-11 12:29:03'),
+(25, 7, 2, '2', '2023-05-11 12:32:24'),
+(26, 2, 7, 'hello', '2023-05-11 12:32:42'),
+(27, 2, 7, '2', '2023-05-11 12:33:39'),
+(28, 7, 2, '2', '2023-05-11 12:39:14'),
+(29, 2, 7, '1', '2023-05-11 12:40:21'),
+(30, 2, 7, NULL, '2023-05-11 12:40:45'),
+(31, 2, 7, '2', '2023-05-11 12:40:54'),
+(32, 2, 7, 'yolo', '2023-05-11 12:41:51'),
+(33, 7, 2, 'chaof b', '2023-05-11 12:41:58'),
+(34, 7, 2, NULL, '2023-05-11 12:42:24'),
+(35, 7, 2, 'hello', '2023-05-11 12:42:34'),
+(36, 2, 7, 'chao b', '2023-05-11 12:42:43'),
+(37, 2, 7, 'hello', '2023-05-11 12:43:25'),
+(38, 7, 2, 'chao b', '2023-05-11 12:43:30'),
+(39, 7, 2, 'hello', '2023-05-11 13:03:55'),
+(40, 7, 2, 'xin chaof tung dang', '2023-05-11 13:05:36');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `moneytransaction`
+--
+
+CREATE TABLE `moneytransaction` (
+  `Id` int(11) NOT NULL,
+  `Status` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `moneytransaction`
+--
+
+INSERT INTO `moneytransaction` (`Id`, `Status`) VALUES
+(8, 1),
+(9, 1),
+(10, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_status`
+--
+
+CREATE TABLE `order_status` (
+  `Id` int(11) NOT NULL,
+  `Status` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_status`
+--
+
+INSERT INTO `order_status` (`Id`, `Status`) VALUES
+(1, 'Chờ xác nhận'),
+(2, 'Đã xác nhận'),
+(3, 'Đang giao hàng'),
+(4, 'Đã giao hàng thành công'),
+(5, 'Đã hủy'),
+(6, 'Test');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `paymentmethod`
+--
+
+CREATE TABLE `paymentmethod` (
+  `ID` int(11) NOT NULL,
+  `Name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `paymentmethod`
+--
+
+INSERT INTO `paymentmethod` (`ID`, `Name`) VALUES
+(1, 'Thanh toán khi nhận hàng'),
+(2, 'Thanh toán ví shopfast');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product`
+--
+
+CREATE TABLE `product` (
+  `Id` int(11) NOT NULL,
+  `Name` varchar(500) NOT NULL,
+  `Price` int(11) NOT NULL,
+  `Description` varchar(600) NOT NULL,
+  `CategoryId` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `QuantityInStock` int(11) DEFAULT NULL,
+  `deleted` tinyint(4) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product`
+--
+
+INSERT INTO `product` (`Id`, `Name`, `Price`, `Description`, `CategoryId`, `user_id`, `QuantityInStock`, `deleted`) VALUES
+(20, 'Áo phông Xanh cây', 200000, 'Áo phông', 2, 2, 90, 0),
+(21, 'Máy ảnh x100', 200000, 'Model x100', 1, 2, 0, 0),
+(22, 'Samsung Galaxy SS4', 3000000, 'Điện thoại thông minh', 3, 2, 81, 0),
+(23, 'Iphone 13 Pro Max', 9999999, 'Điện thoại xịn nhất', 3, 2, 95, 0),
+(24, 'Đồng hồ x100', 555555, 'model x100', 1, 2, 3, 0),
+(25, 'Đồng Hồ MCK', 500000, 'clock', 1, 2, 1, 0),
+(26, 'Áo Phao vàng', 500000, 'Hãng: Gucci', 2, 2, 88, 0),
+(33, 'Hàng Test', 100000, 'Hàng Test', 2, 10, 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rating`
+--
+
+CREATE TABLE `rating` (
+  `Id` int(11) NOT NULL,
+  `MemberId` int(11) NOT NULL,
+  `ProductId` int(11) NOT NULL,
+  `star` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rating`
+--
+
+INSERT INTO `rating` (`Id`, `MemberId`, `ProductId`, `star`) VALUES
+(1, 7, 26, 4),
+(2, 8, 26, 5),
+(3, 1, 25, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roleusers`
+--
+
+CREATE TABLE `roleusers` (
+  `ID` int(11) NOT NULL,
+  `Name` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `roleusers`
+--
+
+INSERT INTO `roleusers` (`ID`, `Name`) VALUES
+(1, 'Admin'),
+(2, 'Người mua'),
+(3, 'Người bán');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `address`
+--
+ALTER TABLE `address`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `MemberId` (`MemberId`);
+
+--
+-- Indexes for table `bill`
+--
+ALTER TABLE `bill`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `IdMember` (`IdMember`);
+
+--
+-- Indexes for table `billdetail`
+--
+ALTER TABLE `billdetail`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `IdBill` (`IdBill`),
+  ADD KEY `Status` (`Status`),
+  ADD KEY `IdProduct` (`IdProduct`);
+
+--
+-- Indexes for table `carrier`
+--
+ALTER TABLE `carrier`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `AddressId` (`AddressId`),
+  ADD KEY `PaymentMethodId` (`PaymentMethodId`);
+
+--
+-- Indexes for table `cartdetail`
+--
+ALTER TABLE `cartdetail`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `CartId` (`CartId`),
+  ADD KEY `ProductId` (`ProductId`);
+
+--
+-- Indexes for table `categoryproduct`
+--
+ALTER TABLE `categoryproduct`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- Indexes for table `comment`
+--
+ALTER TABLE `comment`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `ProductId` (`ProductId`),
+  ADD KEY `MemberId` (`MemberId`);
+
+--
+-- Indexes for table `deposit`
+--
+ALTER TABLE `deposit`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- Indexes for table `imageproduct`
+--
+ALTER TABLE `imageproduct`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `ProductId` (`ProductId`);
+
+--
+-- Indexes for table `member`
+--
+ALTER TABLE `member`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `RoleID` (`RoleID`);
+
+--
+-- Indexes for table `message`
+--
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `FromUserId` (`FromUserId`),
+  ADD KEY `ToUserId` (`ToUserId`);
+
+--
+-- Indexes for table `moneytransaction`
+--
+ALTER TABLE `moneytransaction`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- Indexes for table `order_status`
+--
+ALTER TABLE `order_status`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- Indexes for table `paymentmethod`
+--
+ALTER TABLE `paymentmethod`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `product`
+--
+ALTER TABLE `product`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `CategoryId` (`CategoryId`),
+  ADD KEY `FK_UserId` (`user_id`);
+
+--
+-- Indexes for table `rating`
+--
+ALTER TABLE `rating`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `MemberId` (`MemberId`),
+  ADD KEY `ProductId` (`ProductId`);
+
+--
+-- Indexes for table `roleusers`
+--
+ALTER TABLE `roleusers`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `address`
+--
+ALTER TABLE `address`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `bill`
+--
+ALTER TABLE `bill`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
+
+--
+-- AUTO_INCREMENT for table `billdetail`
+--
+ALTER TABLE `billdetail`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=289;
+
+--
+-- AUTO_INCREMENT for table `carrier`
+--
+ALTER TABLE `carrier`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+
+--
+-- AUTO_INCREMENT for table `cartdetail`
+--
+ALTER TABLE `cartdetail`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
+
+--
+-- AUTO_INCREMENT for table `categoryproduct`
+--
+ALTER TABLE `categoryproduct`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `comment`
+--
+ALTER TABLE `comment`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `deposit`
+--
+ALTER TABLE `deposit`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `imageproduct`
+--
+ALTER TABLE `imageproduct`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `member`
+--
+ALTER TABLE `member`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `message`
+--
+ALTER TABLE `message`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
+-- AUTO_INCREMENT for table `moneytransaction`
+--
+ALTER TABLE `moneytransaction`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `order_status`
+--
+ALTER TABLE `order_status`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `paymentmethod`
+--
+ALTER TABLE `paymentmethod`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `rating`
+--
+ALTER TABLE `rating`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `roleusers`
+--
+ALTER TABLE `roleusers`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `address`
+--
+ALTER TABLE `address`
+  ADD CONSTRAINT `address_ibfk_1` FOREIGN KEY (`MemberId`) REFERENCES `member` (`Id`);
+
+--
+-- Constraints for table `bill`
+--
+ALTER TABLE `bill`
+  ADD CONSTRAINT `bill_ibfk_1` FOREIGN KEY (`IdMember`) REFERENCES `member` (`Id`);
+
+--
+-- Constraints for table `billdetail`
+--
+ALTER TABLE `billdetail`
+  ADD CONSTRAINT `billdetail_ibfk_1` FOREIGN KEY (`IdBill`) REFERENCES `bill` (`Id`),
+  ADD CONSTRAINT `billdetail_ibfk_3` FOREIGN KEY (`Status`) REFERENCES `order_status` (`Id`),
+  ADD CONSTRAINT `billdetail_ibfk_4` FOREIGN KEY (`Status`) REFERENCES `order_status` (`Id`),
+  ADD CONSTRAINT `billdetail_ibfk_5` FOREIGN KEY (`IdProduct`) REFERENCES `product` (`Id`);
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`AddressId`) REFERENCES `address` (`ID`),
+  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`PaymentMethodId`) REFERENCES `paymentmethod` (`ID`);
+
+--
+-- Constraints for table `cartdetail`
+--
+ALTER TABLE `cartdetail`
+  ADD CONSTRAINT `cartdetail_ibfk_1` FOREIGN KEY (`CartId`) REFERENCES `cart` (`Id`),
+  ADD CONSTRAINT `cartdetail_ibfk_2` FOREIGN KEY (`ProductId`) REFERENCES `product` (`Id`);
+
+--
+-- Constraints for table `comment`
+--
+ALTER TABLE `comment`
+  ADD CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`ProductId`) REFERENCES `product` (`Id`),
+  ADD CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`MemberId`) REFERENCES `member` (`Id`);
+
+--
+-- Constraints for table `imageproduct`
+--
+ALTER TABLE `imageproduct`
+  ADD CONSTRAINT `imageproduct_ibfk_1` FOREIGN KEY (`ProductId`) REFERENCES `product` (`Id`);
+
+--
+-- Constraints for table `member`
+--
+ALTER TABLE `member`
+  ADD CONSTRAINT `member_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `roleusers` (`ID`);
+
+--
+-- Constraints for table `message`
+--
+ALTER TABLE `message`
+  ADD CONSTRAINT `message_ibfk_1` FOREIGN KEY (`FromUserId`) REFERENCES `member` (`Id`),
+  ADD CONSTRAINT `message_ibfk_2` FOREIGN KEY (`ToUserId`) REFERENCES `member` (`Id`);
+
+--
+-- Constraints for table `product`
+--
+ALTER TABLE `product`
+  ADD CONSTRAINT `FK_UserId` FOREIGN KEY (`user_id`) REFERENCES `member` (`Id`),
+  ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`CategoryId`) REFERENCES `categoryproduct` (`Id`);
+
+--
+-- Constraints for table `rating`
+--
+ALTER TABLE `rating`
+  ADD CONSTRAINT `rating_ibfk_1` FOREIGN KEY (`MemberId`) REFERENCES `member` (`Id`),
+  ADD CONSTRAINT `rating_ibfk_2` FOREIGN KEY (`ProductId`) REFERENCES `product` (`Id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

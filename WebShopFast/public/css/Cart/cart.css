@@ -1,0 +1,138 @@
+@keyframes fadeIn {
+    0% {opacity: 0;}
+    100% {opacity: 1;} 
+ } 
+
+.header-cart{
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    width: 50px;
+}
+
+.header-cart:hover .cart-hover {
+    display: block;
+}
+
+.cart-icon-wrap{
+    position: relative;
+    display: inline-block;
+    width: 35px;
+}
+
+.cart-icon-wrap-notice{
+    position: absolute;
+    background-color: orange;
+    bottom: 20px;
+    padding: 2px 7px;
+    font-size: 1.0rem;
+    line-height: 1.1rem;
+    border-radius: 50px;
+}
+
+.cart-icon{
+    height: 35px;
+    margin-left: 6px;
+    width: 10px;
+}
+
+.cart-hover{
+    width: 500px;
+    box-shadow: 0 1px 3.125rem 0 rgba(0,0,0,0.1);
+    z-index: 2;
+    margin-top: 55px;
+    margin-right: 10px;
+    display: none;
+    background-color: white;
+    align-items: center;
+    border-radius: 2px;
+    animation: fadeIn ease-in 0.3s;
+    cursor: default;
+}
+
+.cart-hover::after{
+    content: "";
+    position: absolute;
+    right: 448px;
+    top: -30px;
+    border-width: 15px 26px;
+    border-style: solid;
+    border-color: transparent transparent lightgray transparent;
+}
+
+.img-no-cart{
+    width: 80%;
+    height: 90%; 
+    cursor: default;
+    display: none;
+}
+
+.cart-hover-product-heading{
+    margin: 12px;
+    text-align: left;
+    font-size: 1.4rem;
+    color: #999;
+    font-weight: 40;
+}
+
+.cart-hover-list-product{
+    padding-left: 0;
+    list-style: none;
+}
+
+.cart-hover-product{
+    display: flex;
+}
+
+.cart-hover-img{
+    width: 60px;
+    height: 60px;
+    margin: 6px;
+    border: 1px solid black;
+}
+
+.cart-hover-list-product{
+    cursor: default;
+}
+
+.cart-hover-product:hover{
+    background-color: rgb(240, 236, 236);
+}
+
+.cart-hover-product-info{
+    width: 100%;
+    align-items: center;
+}
+
+.cart-hover-product-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cart-hover-product-name{
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: black;
+    margin: 0;
+}
+ 
+.cart-hover-product-price{
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: red;
+}
+
+.cart-hover-product-multiply{
+    font-size: 0.9rem;
+    margin: 0 4px;
+    color: #757575;
+}
+
+.cart-hover-product-quantity{
+    color: #757575;
+    font-size: 1.2rem;
+}
+.cart-hover-delbtn{
+    margin-left: 83%;
+}
